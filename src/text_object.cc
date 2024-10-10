@@ -120,36 +120,6 @@ static int push_ifblock(struct ifblock_stack_obj **ifblock_stack_top,
   struct ifblock_stack_obj *stackobj;
 
   switch (type) {
-    case IFBLOCK_ENDIF:
-      if ((*ifblock_stack_top) == nullptr) {
-        CRIT_ERR("got an endif without matching if");
-      }
-      (*ifblock_stack_top)->obj->ifblock_next = obj;
-      /* if there's some else in between, remove and free it */
-      if ((*ifblock_stack_top)->type == IFBLOCK_ELSE) {
-        stackobj = *ifblock_stack_top;
-        *ifblock_stack_top = stackobj->next;
-        free(stackobj);
-      }
-      /* finally remove and free the if object */
-      stackobj = *ifblock_stack_top;
-      *ifblock_stack_top = stackobj->next;
-      free(stackobj);
-      break;
-    case IFBLOCK_ELSE:
-      if ((*ifblock_stack_top) == nullptr) {
-        CRIT_ERR("got an else without matching if");
-      }
-      (*ifblock_stack_top)->obj->ifblock_next = obj;
-      /* falls through */
-    case IFBLOCK_IF:
-      stackobj = static_cast<ifblock_stack_obj *>(
-          malloc(sizeof(struct ifblock_stack_obj)));
-      stackobj->type = type;
-      stackobj->obj = obj;
-      stackobj->next = *ifblock_stack_top;
-      *ifblock_stack_top = stackobj;
-      break;
     default:
       CRIT_ERR("push_ifblock() misuse detected!");
   }
